@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Admin Panel{% endblock %}
+
+{% block content %}
+<h2 class="mb-4 fw-bold">🛠 Admin Panel</h2>
+
+<div class="mb-3 text-end">
+  <a href="{{ url_for('admin_add_subject') }}" class="btn btn-success">
+    ➕ Add Subject
+  </a>
+</div>
+
+
+<!-- All Students -->
+<h4>👨‍🎓 Registered Students</h4>
+<table class="table table-bordered table-hover">
+  <thead class="table-light">
+    <tr>
+      <B>
+      <th>Name</th>
+      <th>Roll No</th>
+      <th>Email</th>
+      <th>Image</th>
+      <th>Declare Result</th>
+      <th>View Result</th>
+      </b>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in users %}
+    <tr>
+      <td>{{ user.name }}</td>
+      <td>{{ user.roll_no }}</td>
+      <td>{{ user.email }}</td>
+      <td><img src="{{ url_for('static', filename='uploads/' ~ user.image) }}" width="40"></td>
+      <td>
+       <a href="{{ url_for('admin_declare_result', student_id=user.id) }}" class="btn btn-success btn-sm">
+        📢 Declare Result
+      </a>
+      </td>
+      <td
+      <a href="{{ url_for('preview_result_pdf', student_id=user.id) }}" class="btn btn-outline-info btn-sm" target="_blank">
+        👁 View Result (PDF)
+      </a>
+
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- All Subjects -->
+<h4 class="mt-5">📚 Subjects</h4>
+<table class="table table-bordered table-striped">
+  <thead class="table-light">
+    <tr>
+      <th>Code</th>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for subject in subjects %}
+    <tr>
+      <td>{{ subject.sub_code }}</td>
+      <td>{{ subject.name }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- All Results -->
+<h4 class="mt-5">📊 Declared Results</h4>
+<table class="table table-bordered">
+  <thead class="table-light">
+    <tr>
+      <th>Student</th>
+      <th>Roll No</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for res in results %}
+    <tr>
+      <td>{{ res.student.name }}</td>
+      <td>{{ res.student.roll_no }}</td>
+      <td>{{ res.declaration_date.strftime('%d-%m-%Y') }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

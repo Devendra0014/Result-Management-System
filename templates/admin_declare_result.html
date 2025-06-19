@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}Declare Result{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h3 class="mb-4">📢 Declare Result for {{ student.name }} ({{ student.roll_no }})</h3>
+
+  <!-- Form -->
+  <form method="POST">
+    {% if edit_mode %}
+      <input type="hidden" name="subject_id" value="{{ edit_subject.id }}">
+      <div class="mb-4">
+        <label class="form-label">Editing Subject</label>
+        <input type="text" class="form-control" value="{{ edit_subject.name }} ({{ edit_subject.sub_code }})" readonly>
+      </div>
+      <div class="mb-3">
+        <label for="marks" class="form-label">Update Marks</label>
+        <input type="number" name="marks" class="form-control" value="{{ edit_marks }}" required>
+      </div>
+      <button type="submit" class="btn btn-warning">✏️ Update Marks</button>
+      <a href="{{ url_for('admin_declare_result', student_id=student.id) }}" class="btn btn-secondary ms-2">Cancel</a>
+    {% else %}
+      <div class="mb-4">
+        <label for="subject_id" class="form-label">Select Subject</label>
+        <select name="subject_id" class="form-select" required>
+          <option value="">-- Choose Subject --</option>
+          {% for subject in subjects %}
+            {% if subject.id not in existing_items %}
+              <option value="{{ subject.id }}">{{ subject.name }} ({{ subject.sub_code }})</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="marks" class="form-label">Enter Marks</label>
+        <input type="number" name="marks" class="form-control" required>
+      </div>
+      <button type="submit" class="btn btn-primary">💾 Save Marks</button>
+    {% endif %}
+    <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary ms-2">⬅️ Back to Dashboard</a>
+  </form>
+
+  <hr>
+  <!-- Existing Marks -->
+  <h5 class="mt-4">✅ Entered Subjects & Marks</h5>
+  {% if existing_items %}
+    <table class="table table-bordered mt-3">
+      <thead class="table-light">
+        <tr>
+          <th>Subject Code</th>
+          <th>Subject Name</th>
+          <th>Marks</th>
+          <th>Total</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in existing_items.values() %}
+        <tr>
+          <td>{{ item.subject.sub_code }}</td>
+          <td>{{ item.subject.name }}</td>
+          <td>{{ item.marks_obtained }}</td>
+          <td>{{ item.total_marks }}</td>
+          <td>
+            <a href="{{ url_for('admin_declare_result', student_id=student.id, edit=item.subject.id) }}" class="btn btn-sm btn-outline-info">✏️ Edit</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="text-muted">No marks entered yet.</p>
+  {% endif %}
+
+  <!-- Finalize -->
+  {% if is_result_complete(result) %}
+    <form method="POST" action="{{ url_for('finalize_result', student_id=student.id) }}">
+      <button class="btn btn-success mt-4">✅ Declare Final Result</button>
+    </form>
+  {% else %}
+    <div class="alert alert-warning mt-4">
+      ❗ Please enter marks for all subjects before declaring result.
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

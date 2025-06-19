@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}My GTU Result{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="text-center mb-4">
+    <h2 class="fw-bold">🎓 Gujarat Technological University</h2>
+    <p class="text-muted">Result Sheet - {{ result.declaration_date.strftime('%d-%m-%Y') }}</p>
+  </div>
+
+  <!-- Student Info -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <p><strong>Name:</strong> {{ student.name }}</p>
+      <p><strong>Enrollment No:</strong> {{ student.roll_no }}</p>
+      <p><strong>Department:</strong> {{ student.department or 'N/A' }}</p>
+      <p><strong>Course:</strong> {{ student.course or 'N/A' }}</p>
+    </div>
+  </div>
+
+  <!-- Result Table -->
+  {% if result_items and result_items|length > 0 %}
+    <table class="table table-bordered table-striped">
+      <thead class="table-primary">
+        <tr>
+          <th>Subject Code</th>
+          <th>Subject Name</th>
+          <th>Marks Obtained</th>
+          <th>Total Marks</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in result_items %}
+        <tr>
+          <td>{{ item.subject.sub_code }}</td>
+          <td>{{ item.subject.name }}</td>
+          <td>{{ item.marks_obtained }}</td>
+          <td>{{ item.total_marks }}</td>
+          <td>
+            {% if item.marks_obtained >= 33 %}
+              ✅ PASS
+            {% else %}
+              ❌ FAIL
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Summary -->
+    <div class="alert alert-info">
+      <strong>Total:</strong> {{ total }} / {{ full }} <br>
+      <strong>Percentage:</strong> {{ ((total / full) * 100) | round(2) }}% <br>
+      <strong>Status:</strong>
+      {% if ((total / full) * 100) >= 33 %}
+        ✅ Passed
+      {% else %}
+        ❌ Failed
+      {% endif %}
+    </div>
+  {% else %}
+    <div class="alert alert-warning">
+      ⚠️ No marks data available to calculate result.
+    </div>
+  {% endif %}
+</div>
+<!-- 📥 PDF Button -->
+<a href="{{ url_for('download_result_pdf', student_id=student.id) }}" class="btn btn-primary mt-3">
+  📄 Download PDF
+</a>
+ <a href="{{ url_for('dashboard') }}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+
+{% endblock %}
